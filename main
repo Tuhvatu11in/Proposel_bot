@@ -2,12 +2,12 @@ import telebot
 from telebot import types
 
 # Указываем токен вашего бота в Telegram
-bot = telebot.TeleBot('6203770826:AAExslgbfw1byh9zFMeOMQ06N7uelGR_ycs')
+bot = telebot.TeleBot('')
 proposals = []
 temp_prop = {}
-CHANNEL_CHAT_ID = '-1002094689208'
+CHANNEL_CHAT_ID = ''
 admin_chat_ID = []
-admin_KEY = '!!!'
+admin_KEY = ''
 
 markup2 = types.ReplyKeyboardMarkup(resize_keyboard=True)
 item2 = types.KeyboardButton("👍")
