@@ -1,0 +1,47 @@
+import telebot
+from telebot import types
+
+# Указываем токен вашего бота в Telegram
+bot = telebot.TeleBot('6203770826:AAExslgbfw1byh9zFMeOMQ06N7uelGR_ycs')
+proposals = []
+temp_prop = {}
+CHANNEL_CHAT_ID = '-1002094689208'
+admin_chat_ID = []
+admin_KEY = '!!!'
+
+markup2 = types.ReplyKeyboardMarkup(resize_keyboard=True)
+item2 = types.KeyboardButton("👍")
+item3 = types.KeyboardButton("👎")
+markup2.add(item2, item3)
+
+markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True)
+item1 = types.KeyboardButton("Рассмотреть")
+markup1.add(item1)
+
+
+@bot.message_handler(func=lambda message: True)
+def handle_all_messages(message):
+    if message.chat.id not in admin_chat_ID:
+        if message.text == admin_KEY:
+            admin_chat_ID.append(message.chat.id)
+        else:
+            proposals.append(message.text)
+            bot.send_message(message.chat.id, 'Администраторы рассмотрят ваше предложение')
+            for admin in admin_chat_ID:
+                bot.send_message(admin, "Новое предложение", reply_markup=markup1)
+    elif len(proposals) == 0:
+        bot.send_message(message.chat.id, 'Предложений больше нет')
+    else:
+        if message.text in ['Рассмотреть', "👍", "👎"]:
+            bot.send_message(message.chat.id, proposals[0])
+            temp_prop[message.chat.id] = proposals[0]
+            bot.send_message(message.chat.id, 'Публикуем?', reply_markup=markup2)
+        if message.text == "👍":
+            if temp_prop[message.chat.id] != '':
+                bot.send_message(CHANNEL_CHAT_ID, temp_prop[message.chat.id])
+                proposals.pop(proposals.index(temp_prop[message.chat.id]))
+        if message.text == "👎":
+            proposals.pop(proposals.index(temp_prop[message.chat.id]))
+
+
+bot.polling()
