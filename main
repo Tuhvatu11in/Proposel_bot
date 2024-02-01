@@ -1,6 +1,7 @@
 import telebot
 from telebot import types
 
+
 # Указываем токен вашего бота в Telegram
 bot = telebot.TeleBot('YOUR_BOT_TOKEN')
 proposals = []  # Список предложений
