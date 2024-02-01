@@ -2,8 +2,7 @@ import telebot
 from telebot import types
 
 
-# Указываем токен вашего бота в Telegram
-bot = telebot.TeleBot('YOUR_BOT_TOKEN')
+bot = telebot.TeleBot('YOUR_BOT_TOKEN') # Указываем токен вашего бота в Telegram
 proposals = []  # Список предложений
 temp_prop = {}  # Временное хранение текущего предложения
 CHANNEL_CHAT_ID = 'YOUR_CHANNEL_ID'  # ID вашего канала
