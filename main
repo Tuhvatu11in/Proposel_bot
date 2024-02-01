@@ -2,46 +2,48 @@ import telebot
 from telebot import types
 
 # Указываем токен вашего бота в Telegram
-bot = telebot.TeleBot('')
-proposals = []
-temp_prop = {}
-CHANNEL_CHAT_ID = ''
-admin_chat_ID = []
-admin_KEY = ''
+bot = telebot.TeleBot('YOUR_BOT_TOKEN')
+proposals = []  # Список предложений
+temp_prop = {}  # Временное хранение текущего предложения
+CHANNEL_CHAT_ID = 'YOUR_CHANNEL_ID'  # ID вашего канала
+admin_chat_ID = []  # Список ID администраторов
+admin_KEY = 'YOUR_ADMIN_KEY'  # Специальный ключ для получения статуса администратора
 
+# Клавиатура для подтверждения или отклонения предложения
 markup2 = types.ReplyKeyboardMarkup(resize_keyboard=True)
-item2 = types.KeyboardButton("👍")
-item3 = types.KeyboardButton("👎")
+item2 = types.KeyboardButton("👍")  # Кнопка подтверждения
+item3 = types.KeyboardButton("👎")  # Кнопка отклонения
 markup2.add(item2, item3)
 
+# Клавиатура для рассмотрения предложения администратором
 markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True)
 item1 = types.KeyboardButton("Рассмотреть")
 markup1.add(item1)
 
-
+# Обработчик всех входящих сообщений
 @bot.message_handler(func=lambda message: True)
 def handle_all_messages(message):
-    if message.chat.id not in admin_chat_ID:
-        if message.text == admin_KEY:
-            admin_chat_ID.append(message.chat.id)
-        else:
+    if message.chat.id not in admin_chat_ID:  # Если отправитель не администратор
+        if message.text == admin_KEY:  # Если отправлен специальный ключ
+            admin_chat_ID.append(message.chat.id)  # Добавляем ID отправителя в список администраторов
+        else:  # Иначе добавляем предложение в список
             proposals.append(message.text)
             bot.send_message(message.chat.id, 'Администраторы рассмотрят ваше предложение')
             for admin in admin_chat_ID:
-                bot.send_message(admin, "Новое предложение", reply_markup=markup1)
-    elif len(proposals) == 0:
+                bot.send_message(admin, "Новое предложение", reply_markup=markup1)  # Отправляем уведомление администраторам
+    elif len(proposals) == 0:  # Если предложений нет, отсылаем уведомление
         bot.send_message(message.chat.id, 'Предложений больше нет')
-    else:
+    else:  # Иначе обрабатываем решение администратора по предложению
         if message.text in ['Рассмотреть', "👍", "👎"]:
-            bot.send_message(message.chat.id, proposals[0])
-            temp_prop[message.chat.id] = proposals[0]
-            bot.send_message(message.chat.id, 'Публикуем?', reply_markup=markup2)
-        if message.text == "👍":
-            if temp_prop[message.chat.id] != '':
-                bot.send_message(CHANNEL_CHAT_ID, temp_prop[message.chat.id])
-                proposals.pop(proposals.index(temp_prop[message.chat.id]))
-        if message.text == "👎":
-            proposals.pop(proposals.index(temp_prop[message.chat.id]))
+            bot.send_message(message.chat.id, proposals[0])  # Отправляем первое предложение для рассмотрения
+            temp_prop[message.chat.id] = proposals[0]  # Сохраняем текущее предложение во временное хранилище
+            bot.send_message(message.chat.id, 'Публикуем?', reply_markup=markup2)  # Запрашиваем решение администратора
+        if message.text == "👍":  # Если администратор подтверждает
+            if temp_prop[message.chat.id] != '':  # Проверяем временное хранилище
+                bot.send_message(CHANNEL_CHAT_ID, temp_prop[message.chat.id])  # Публикуем предложение в канале
+                proposals.pop(proposals.index(temp_prop[message.chat.id]))  # Удаляем предложение из списка
+        if message.text == "👎":  # Если администратор отклоняет
+            proposals.pop(proposals.index(temp_prop[message.chat.id]))  # Удаляем предложение из списка
 
-
+# Запуск бота
 bot.polling()
